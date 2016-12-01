@@ -13,7 +13,7 @@ Il "mode" che ho creato per il linguaggio Pearl su codemirror è già definito a
 L'estensione di ST si trova nella cartella "BackEnd" e contiene anche il Javadoc.
 
 #SemanticTurkeyData
-Per far funzionare l'applicazione ho creato nella cartella "SemanticTurkeyData" una mia cartella MyApp.
+Per far funzionare l'applicazione ho creato nella cartella "SemanticTurkeyData" una mia cartella MyApp presente nel .zip "MyApp".
 MyApp è strutturata in 4 sottocartelle:
 - File --> in cui viene salvato il file .rdf generato per il download delle triple
 - FileProcessed --> che credo forse non serva più viste alcune modifiche che avevo apportato al codice
