@@ -1,0 +1,50 @@
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+    <div class="appName">
+        <a class="navbar-brand">Tesi</a>
+    </div>
+    <ul class="nav navbar-nav">
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Menu
+            <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a (click)="goTo('/document-analyzer')">Document Analyzer</a></li>
+                <li><a (click)="goTo('pearl-editor')">Pearl Editor</a></li>
+                <li><a (click)="goTo('annotator-installer')">Annotator Installer</a></li>
+            </ul>
+        </li>
+    </ul>
+    <div class="appName">
+        <button type="button" class="btn btn-default" style="float:right;margin-top:5px;" (click)="disconnectFromProject()">
+            Disconnect
+        </button>
+        <a class="navbar-brand" style="float:right;">Project: {{project}}</a>
+    </div>
+  </div>
+</nav>
+
+<h1>Annotator Installer</h1>
+<hr>
+
+<div class="container">
+    <!-- Form -->
+    <form #annotatorInstallerForm="ngForm">
+        <div class="form-group">
+            <label for="inputFile">Annotator - UIMA Pear File (.pear)</label>
+            <input #inputFile id="inputFile" class="form-control" type="file"
+                   (change)="fileChangeEvent(inputFile.files[0])" ngControl="inputFile">
+        </div>
+        <button type="button" class="btn btn-default"
+                (click)="installAnnotator()">
+                Install
+        </button>
+    </form>
+    <div class="error" *ngIf="errorMessage"> {{errorMessage}} </div>
+    <div *ngIf="annotatorUploaded" style="text-align: center;">
+        <h2>Annotator installed.</h2>
+    </div>
+    <div *ngIf="annotatorUploading" style="text-align: center;">
+        <h2>Installing annotator...</h2>
+    </div>
+
+</div>

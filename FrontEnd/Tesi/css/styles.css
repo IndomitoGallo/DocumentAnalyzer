@@ -1,0 +1,194 @@
+/* Master Styles */
+h1 {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 250%;
+  text-align: center;
+}
+h2 {
+  text-align: center;
+}
+h2, h3 {
+  color: #444;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: lighter;
+}
+body {
+  margin: 2em;
+}
+body, input[text], button {
+  color: #888;
+  font-family: Cambria, Georgia;
+}
+a {
+  cursor: pointer;
+  cursor: hand;
+}
+/* everywhere else */
+* {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+.row.content {height: 550px}
+
+/* Set gray background color and 100% height */
+.sidenav {
+    background-color: #f1f1f1;
+    height: 100%;
+}
+
+/* On small screens, set height to 'auto' for the grid */
+@media screen and (max-width: 767px) {
+    .row.content {height: auto;}
+}
+
+.container-fluid {
+    margin-top: 5px;
+}
+
+#resultsContainer {
+    max-height: 500px;
+}
+
+#analyzerView {
+    min-height: 120px;
+}
+
+#htmlView {
+    border: 1px solid #C0C0C0;
+    background-color: white;
+    margin-top: 10px;
+    color: black;
+    overflow: auto;
+    height: 400px;
+}
+
+#htmlView p {
+    padding: 1px 5px 1px 5px;
+}
+
+iframe {
+    border: 1px solid #C0C0C0;
+    margin-top: 10px;
+    height: 400px;
+    width: 100%;
+}
+
+#legend {
+    color: black;
+}
+
+.pearlButton {
+    margin-top: 25px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+}
+
+.uploadPearl {
+    margin-top: 25px;
+}
+
+#triples-container {
+    background-color: white;
+    border: 1px solid #999;
+}
+
+#coda_triples, #rules_preview {
+    color: #111;
+}
+
+.prbtn-column {
+    width: 10%;
+}
+
+#annotationId {
+    float: left;
+}
+
+.tree {
+	  list-style-type: none;
+	  margin-left:-40px;
+}
+.innerTree {
+	  padding-left:37px;
+	  list-style-type:none;
+}
+.treeLabel {
+	  color: orange;
+}
+.treeId {
+    color: black;
+}
+.labelContent {
+	  padding-left:30px;
+}
+
+samp {
+    /*font-size: 80%;*/
+    font-size: 55%;
+    font-weight: bold;
+}
+
+td {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.added-triples samp {
+    font-size: 70%;
+}
+
+#downloadTriples:link, a:visited {
+    background-color: white;
+    color: black;
+    border: 2px solid #6495ED;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 10px;
+
+}
+
+#downloadTriples:hover, a:active {
+    background-color: #6495ED;
+    color: white;
+}
+
+.error {
+    color: red;
+    font-weight: bold;
+    margin: 5px 5px 5px 5px;
+}
+
+#selectAllLabel {
+    margin: 0;
+}
+
+sup {
+    cursor: pointer;
+    background: #ffffff;
+    border: 1px solid #666666;
+    -webkit-border-radius: 57;
+    -moz-border-radius: 57;
+    border-radius: 57px;
+    -moz-box-shadow: 0px 0px 1px #666666;
+    font-family: Arial;
+    color: #1b285c;
+    font-size: 9px;
+    padding: 2px 2px 2px 2px;
+    margin: 0px 3px 0px 3px;
+    display: inline;
+}
+
+sup:hover {
+    background-image: -webkit-linear-gradient(top, #43e82a, #f5f525);
+    background-image: -moz-linear-gradient(top, #43e82a, #f5f525);
+    background-image: -ms-linear-gradient(top, #43e82a, #f5f525);
+    background-image: -o-linear-gradient(top, #43e82a, #f5f525);
+    background-image: linear-gradient(to bottom, #43e82a, #f5f525);
+    text-decoration: none;
+}

@@ -1,0 +1,263 @@
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+    <div class="appName">
+        <a class="navbar-brand">Tesi</a>
+    </div>
+    <ul class="nav navbar-nav">
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Menu
+            <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a (click)="goTo('/document-analyzer')">Document Analyzer</a></li>
+                <li><a (click)="goTo('/pearl-editor')">Pearl Editor</a></li>
+                <li><a (click)="goTo('/annotator-installer')">Annotator Installer</a></li>
+            </ul>
+        </li>
+    </ul>
+    <div class="appName">
+        <button type="button" class="btn btn-default" style="float:right;margin-top:5px;" (click)="disconnectFromProject()">
+            Disconnect
+        </button>
+        <a class="navbar-brand" style="float:right;">Project: {{project}}</a>
+    </div>
+  </div>
+</nav>
+
+<h1>Document Analyzer</h1>
+<hr>
+
+<!-- Form -->
+<div *ngIf="!analysisStarted" class="container">
+
+    <form *ngIf="annotatorsLoaded" #analyzerForm="ngForm">
+        <div class="form-group">
+            <label for="inputFile">Input File or URL</label>
+            <input #inputFile id="inputFile" class="form-control" type="file" (change)="fileChangeEvent(inputFile.files[0])" ngControl="inputFile">
+        </div>
+        <div class="form-group">
+            <label for="annotator">Annotator</label>
+            <select class="form-control" required
+                    ngControl="annotator"
+                    name="annotatorChosen" [(ngModel)]="annotatorChosen">
+                <option *ngFor="let ann of annotators" [value]="ann">{{ann}}</option>
+            </select>
+        </div>
+        <!--div class="form-group">
+            <label for="ch_enc">Character Encoding</label>
+            <select class="form-control" required
+                    ngControl="ch_enc"
+                    name="encoding" [(ngModel)]="encoding">
+                <option *ngFor="let char of charEncoding" [value]="char">{{char}}</option>
+            </select>
+        </div-->
+        <div class="form-group">
+            <label for="lng">Language</label>
+            <select class="form-control" required
+                    ngControl="lng"
+                    name="language" [(ngModel)]="language">
+                <option *ngFor="let language of languages" [value]="language">{{language}}</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="inputFormat">Input File Format</label>
+            <select class="form-control" required
+                    ngControl="inputFormat"
+                    name="inputFormat" [(ngModel)]="inputFormat">
+                <option *ngFor="let input of inputFormats" [value]="input">{{input}}</option>
+            </select>
+        </div>
+        <button type="button" class="btn btn-default" [disabled]="!analyzerForm.form.valid"
+                (click)="analyze()">
+                Analyze
+        </button>
+    </form>
+    <div class="error" *ngIf="errorMessage"> {{errorMessage}} </div>
+
+</div>
+
+<!-- Results -->
+<div *ngIf="analysisStarted" class="container-fluid">
+    <div class="row content">
+
+        <div *ngIf="analysisComplete" class="col-sm-12" id="resultsContainer">
+            <div class="well" id="analyzerView">
+
+                <button type="button" class="btn btn-default" (click)="newAnalysis()">New Analysis</button>
+                <div id="legend" [innerHTML]="legend"></div>
+                <div class="form-group">
+
+                    <div style="clear: both;" *ngIf="textAnalysis" id="htmlView" [innerHTML]="htmlText">
+                    </div>
+                    <iframe style="clear: both;" *ngIf="htmlAnalysis" [srcdoc]="htmlText">
+                    </iframe>
+
+                </div>
+                <div>
+                    <p>To view the details of a specific annotation select the id:</p>
+                    <form class="form-inline">
+                        <select class="form-control" #annotationId id="annotationId" name="annotationId">
+                            <option *ngFor="let annId of annotationsId" [value]="annId">{{annId}}</option>
+                        </select>
+                    </form>
+                    <button type="button" id="annotationPreview" class="btn btn-info" data-toggle="modal" data-target="#annotationModal" (click)="getAnnotationContent(annotationId.value)">
+                        Annotation Preview
+                    </button>
+                </div>
+                <br>
+                <button type="button" id="triplesPreview" class="btn btn-info btn-lg" data-toggle="modal" data-target="#triplesModal" (click)="getTriplesPreview()">
+                    Triples Preview
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="triplesModal" role="dialog">
+                    <div class="modal-dialog modal-lg">
+                        <div *ngIf="tripleErrorMessage" class="modal-content">
+                            <div class="modal-body">
+                                <div class="error">
+                                    {{ errorMessage }}
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="triplesPreviewReceived" class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Triples Preview</h4>
+                            </div>
+                            <div class="modal-body">
+                                <table class="table table-hover" id="coda_triples">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 33%;">Subject</th>
+                                            <th style="width: 33%;">Predicate</th>
+                                            <th style="width: 33%;">Object</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let triple of cacheTriples">
+                                            <td style="width: 33%;"><samp>{{ triple.subject }}</samp></td>
+                                            <td style="width: 33%;"><samp>{{ triple.predicate }}</samp></td>
+                                            <td style="width: 33%;"><samp>{{ triple.object }}</samp></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <p *ngIf="addingTriples">Generazione delle triple in corso</p>
+                                <p *ngIf="triplesGenerated">Triple generate</p>
+                                <button type="button" class="btn btn-success" (click)="addTriples()">Add Triples</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Annotation Modal -->
+                <div class="modal fade" id="annotationModal" role="dialog">
+                    <div class="modal-dialog modal-lg">
+                        <div *ngIf="annErrorMessage" class="modal-content">
+                            <div class="modal-body">
+                                <div class="error">
+                                    {{ errorMessage }}
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="annContentAndPearlRulesReceived" class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Annotation's Triples Preview</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p style="font-weight: bold; color: black;" [innerHTML]="annotationType"></p>
+                                <p style="color: black;" [innerHTML]="annotationContent"></p>
+                                <!--h4 style="font-weight: bold; color: black;">Annotation Tree</h4>
+                                <p [innerHTML]="annotationTree"></p-->
+                                <table class="table table-hover" id="rules_preview">
+                                    <thead>
+                                        <tr>
+                                            <th>Rule</th>
+                                            <!--th>AnnotationId</th-->
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let rule of usefulPearlRules">
+                                            <td>{{ rule.name }}</td>
+                                            <!--td>{{ rule.annotationId }}</td-->
+                                            <td>
+                                                <button type="button" class="btn btn-primary" (click)="getTriplesPreviewOfAnnotation(rule.uimaType, rule.annotationId)">
+                                                    Apply Rule
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div *ngIf="annTriplesPreviewReceived" class="modal-body">
+                                <table class="table table-hover" id="coda_triples">
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Predicate</th>
+                                            <th>Object</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let triple of annTriples">
+                                            <td><samp>{{ triple.subject }}</samp></td>
+                                            <td><samp>{{ triple.predicate }}</samp></td>
+                                            <td><samp>{{ triple.object }}</samp></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <p *ngIf="addingTriples">Generazione delle triple in corso</p>
+                                <p *ngIf="triplesGenerated">Triple generate</p>
+                                <button type="button" class="btn btn-success" (click)="addTriplesOfAnnotation()">Add Triples</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div *ngIf="triplesGenerated" class="row">
+                <div class="col-sm-12">
+                    <div class="well">
+                        <h4>Generated Triples</h4>
+                        <a [href]="downloadLink" target="_blank" class="btn btn-success" style="margin-bottom: 5px">Export Triples</a>
+                        <!--button id="downloadTriples" type="button" class="btn btn-success" (click)="exportTriples()">Export Triples</button>
+                        <p if="downloadLink" *ngIf="downloadReady">
+                            Per scaricare il file <a id="a" [href]="downloadURL" [download]="triples.rdf">clicca qui</a>
+                        </p-->
+                        <div class="container" id="triples-container">
+                            <table class="table table-hover added-triples" id="coda_triples">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Predicate</th>
+                                        <th>Object</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let triple of generatedTriples">
+                                        <td><samp>{{ triple.subject }}</samp></td>
+                                        <td><samp>{{ triple.predicate }}</samp></td>
+                                        <td><samp>{{ triple.object }}</samp></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="!analysisComplete" class="col-sm-12">
+            <h3 style="font-weight:bold; text-align:center;">Il Document Analyzer sta processando i file, attendere...</h3>
+        </div>
+        <div *ngIf="errorMessage" class="error">
+            {{ errorMessage }}
+        </div>
+    </div>
+</div>

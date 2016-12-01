@@ -1,0 +1,11 @@
+.CodeMirror-selection-highlight-scrollbar {background-color: lightgreen}
+.cm-matchhighlight {background-color: lightgreen}
+.CodeMirror { border: 1px solid silver; }
+.CodeMirror-empty { outline: 1px solid #c22; }
+.CodeMirror-empty.CodeMirror-focused { outline: none; }
+.CodeMirror pre.CodeMirror-placeholder { color: #999; }
+
+#code {
+    width: 800px;
+    height: 800px;
+}

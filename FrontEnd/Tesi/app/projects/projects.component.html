@@ -1,0 +1,81 @@
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+    <div class="appName">
+        <a class="navbar-brand">Tesi</a>
+    </div>
+  </div>
+</nav>
+
+<h1>Projects</h1>
+<hr>
+
+<div class="container">
+
+    <button type="button" class="btn btn-default" (click)="openForm()">New Project</button>
+    <table *ngIf="projectsListReceived" class="table table-hover">
+        <thead>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let project of projects">
+                <td>{{ project }}</td>
+                <td class="prbtn-column"><button type="button" class="btn btn-success" (click)="accessProject(project)">Open Project</button></td>
+                <td><button type="button" class="btn btn-danger" (click)="deleteProject(project)">Delete Project</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <form *ngIf="creationEnabled" #projectForm="ngForm">
+        <h2 style="text-align: center;">New Project</h2>
+        <div class="form-group">
+            <label for="name">Project Name</label>
+            <input name="projectName" [(ngModel)]="projectName" id="name" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="modelType">Project Type</label>
+            <select class="form-control" required name="modelType" [(ngModel)]="modelType">
+                <option></option>
+                <option [value]="1">OWL</option>
+                <option [value]="2">SKOS</option>
+                <option [value]="3">SKOS-XL</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="uri">URI</label>
+            <input name="baseURI" [(ngModel)]="baseURI" id="uri" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="tripleStore">Triple Store</label>
+            <select class="form-control" required name="tripleStore" [(ngModel)]="tripleStore">
+                <option [value]="1">
+                    OntologyManagerFactorySesame2Impl
+                </option>
+                <option [value]="2">
+                    OntologyManagerFactoryRDF4JImpl
+                </option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="mode">Mode</label>
+            <select class="form-control" required name="modelConfigClass" [(ngModel)]="modelConfigClass">
+              <option [value]="1">
+                  in memory / persistent
+              </option>
+              <option [value]="2">
+                  in memory / no persist
+              </option>
+              <option [value]="3">
+                  native store / persistent
+              </option>
+            </select>
+        </div>
+        <button type="button" class="btn btn-default" (click)="createProject()">
+                Create
+        </button>
+    </form>
+    <div class="error" *ngIf="errorMessage"> {{errorMessage}} </div>
+</div>
