@@ -1,0 +1,239 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>it.uniroma2.art.semanticturkey</groupId>
+	<artifactId>st_exp-extension</artifactId>
+	<packaging>bundle</packaging>
+	<version>1.0-SNAPSHOT</version>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<spring.version>3.2.4.RELEASE</spring.version>
+		<st.version>0.13-SNAPSHOT</st.version>
+		<dist.client>${project.build.directory}/st-client</dist.client>
+		<dist.client.finalName>${project.build.finalName}.xpi</dist.client.finalName>
+	</properties>
+
+	<dependencies>
+		<!-- This dependency provides the annotations for describing Semantic Turkey 
+			services -->
+		<dependency>
+			<groupId>it.uniroma2.art.semanticturkey</groupId>
+			<artifactId>st-codegen-annotations</artifactId>
+			<version>${st.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<!-- The following dependency is necessary for the execution of the annotation 
+			processor generating sources from the annotations on Semantic Turkey services -->
+		<dependency>
+			<groupId>it.uniroma2.art.semanticturkey</groupId>
+			<artifactId>st-codegen-processor</artifactId>
+			<version>${st.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>it.uniroma2.art.semanticturkey</groupId>
+			<artifactId>st-core-framework</artifactId>
+			<version>${st.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Spring mvc -->
+		<!-- dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+			<scope>provided</scope>
+		</dependency-->
+		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>4.3.2.RELEASE</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>4.3.2.RELEASE</version>
+            <type>jar</type>
+        </dependency>
+
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<!-- we had problems in using standard wab deployment (referencing the 
+					WEB-INF/classes from depending wabs) -->
+				<!-- thus we have manually managed the webapp directory and we still 
+					put the classes in the . position -->
+				<directory>src/main/webapp</directory>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.3.7</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<!-- <_wab>src/main/webapp</_wab> could also use src/main/resources 
+							if you like -->
+
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Webapp-Context>${project.artifactId}</Webapp-Context>
+						<Web-ContextPath>semanticturkey/${project.groupId}/${project.artifactId}</Web-ContextPath>
+
+						<Export-Package>
+							<!-- The following is required to make provided service classes available 
+								for extensions -->
+							{local-packages}
+						</Export-Package>
+						<Import-Package>
+							it.uniroma2.art.owlart.exceptions,
+							it.uniroma2.art.owlart.model,
+							it.uniroma2.art.owlart.models,
+							it.uniroma2.art.semanticturkey.exceptions,
+							it.uniroma2.art.semanticturkey.project,
+							it.uniroma2.art.semanticturkey.services,
+							org.aopalliance.aop,
+							org.hibernate.validator,
+							org.springframework.aop,
+							org.springframework.aop.framework,
+							org.springframework.beans.factory,
+							org.springframework.cglib.core,
+							org.springframework.cglib.proxy,
+							org.springframework.cglib.reflect,
+							org.springframework.core.convert,
+							org.springframework.osgi.web.context.support,
+							org.springframework.validation.beanvalidation,
+							org.springframework.web.context,
+							org.springframework.web.multipart.commons,
+							org.springframework.web.servlet,
+
+							<!-- This dependency is required for the instantiation of the ST HTTP 
+								Context -->
+							it.uniroma2.art.semanticturkey.services.http,
+							<!-- This dependency is required for the exception handler -->
+							it.uniroma2.art.semanticturkey.mvc,
+							*
+						</Import-Package>
+
+					</instructions>
+				</configuration>
+			</plugin>
+
+			<!-- Build of the xpi. -->
+
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${dist.client}</outputDirectory>
+							<includeEmptyDirs>true</includeEmptyDirs>
+							<resources>
+								<resource>
+									<directory>src/main/firefox</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>chrome.manifest</include>
+										<include>install.rdf</include>
+										<include>components/data/sturkey.properties</include>
+									</includes>
+								</resource>
+								<!-- this is to copy all the rest, being sure that we don't copy 
+									again the things which have been processed (filtering=true) for substituting 
+									Maven variables. Thus we have to copy everything, but excluding the elements 
+									above -->
+								<resource>
+									<directory>src/main/firefox</directory>
+									<filtering>false</filtering>
+									<excludes>
+										<exclude>chrome.manifest</exclude>
+										<exclude>install.rdf</exclude>
+									</excludes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<!-- generates features.xml -->
+					<execution>
+						<id>generate-features</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/features</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- Build of Firefox client -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<target>
+								<zip destfile="${project.build.directory}/${dist.client.finalName}"
+									basedir="${dist.client}" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Build of Firefox client -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.10</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>${project.build.directory}/${dist.client.finalName}</file>
+									<type>xpi</type>
+								</artifact>
+							</artifacts>
+						</configuration>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>

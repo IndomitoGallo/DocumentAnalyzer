@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://exampleExtension/skin/styles/style.css" type="text/css"?>
+
+<window id="import-window" title="Example Extension"
+	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+	<script type="application/x-javascript"	src="chrome://exampleExtension/content/scripts/example.js" />
+	
+	<vbox flex="1">
+		
+		<textbox id="testTxt" placeholder="type something here"></textbox>
+		<button id="testBtn" label="Click me!"></button>
+		<label id="testLbl"></label>
+		
+	</vbox>
+
+</window>
